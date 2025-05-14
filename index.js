@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+require('dotenv').config();
 const port = process.env.PORT || 3000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
-require('dotenv').config()
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
 
 
 app.use(cors());
@@ -49,6 +50,32 @@ async function run() {
         })
 
 
+        app.put('/coffees/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedCoffee = req.body;
+            const updatedDoc = {
+                $set: updatedCoffee
+            }
+            const result = await coffeeCollection.updateOne(query, updatedDoc, options)
+            res.send(result);
+        })
+
+        app.get('/coffees/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await coffeeCollection.findOne(query);
+            res.send(result);
+        })
+
+
+        app.delete('/coffees/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await coffeeCollection.deleteOne(query);
+            res.send(result)
+        })
 
 
         // Send a ping to confirm a successful connection
